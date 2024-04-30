@@ -1,8 +1,8 @@
 //
-//  mazestack.cpp
+//  mazequeue.cpp
 //  s24Homework2
 //
-//  Created by Cameron Maiden on 4/28/24.
+//  Created by Cameron Maiden on 4/30/24.
 //
 
 ///////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec);
 ///////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <stack>
+#include <queue>
 
 using namespace std;
 
@@ -66,15 +66,15 @@ private:
 
 bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
 {
-    stack<Coord> coordStack;
-    coordStack.push(Coord(sr,sc));
+    queue<Coord> coordQueue;
+    coordQueue.push(Coord(sr,sc));
     maze[sr][sc] = '#';
     
-    while(!coordStack.empty())
+    while(!coordQueue.empty())
     {
-        Coord curr = coordStack.top();
-        cerr << "Coordinate popped off the stack: [" << curr.r() << "][" << curr.c() << "]" << endl;
-        coordStack.pop();
+        Coord curr = coordQueue.front();
+        cerr << "Coordinate popped from the queue: [" << curr.r() << "][" << curr.c() << "]" << endl;
+        coordQueue.pop();
         
         if (curr.r() == er && curr.c() == ec) // if the current coordinate is equal to the ending coordinate
             return true;
@@ -85,7 +85,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
 ///             maze[r][c+1] to indicate the algorithm has encountered it.
         if(maze[curr.r()][curr.c()+1] != 'X' && maze[curr.r()][curr.c()+1] != '#') // if EAST discoverable
         {
-            coordStack.push(Coord(curr.r(), curr.c()+1));
+            coordQueue.push(Coord(curr.r(), curr.c()+1));
             maze[curr.r()][curr.c()+1] = '#';
         }
         
@@ -94,7 +94,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
 ///             maze[r+1][c] to indicate the algorithm has encountered it.
         if(maze[curr.r()+1][curr.c()] != 'X' && maze[curr.r()+1][curr.c()] != '#') // if SOUTH discoverable
         {
-            coordStack.push(Coord(curr.r()+1, curr.c()));
+            coordQueue.push(Coord(curr.r()+1, curr.c()));
             maze[curr.r()+1][curr.c()] = '#';
         }
         
@@ -103,7 +103,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
 ///             maze[r][c-1] to indicate the algorithm has encountered it.
         if(maze[curr.r()][curr.c()-1] != 'X' && maze[curr.r()][curr.c()-1] != '#') // if WEST discoverable
         {
-            coordStack.push(Coord(curr.r(), curr.c()-1));
+            coordQueue.push(Coord(curr.r(), curr.c()-1));
             maze[curr.r()][curr.c()-1] = '#';
         }
         
@@ -112,7 +112,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
 ///             maze[r-1][c] to indicate the algorithm has encountered it.
         if(maze[curr.r()-1][curr.c()] != 'X' && maze[curr.r()-1][curr.c()] != '#') // if NORTH discoverable
         {
-            coordStack.push(Coord(curr.r()-1, curr.c()));
+            coordQueue.push(Coord(curr.r()-1, curr.c()));
             maze[curr.r()-1][curr.c()] = '#';
         }
 
