@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C1B33D492BDF1F8400A54701 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B33D482BDF1F8400A54701 /* main.cpp */; };
+		C1B33D492BDF1F8400A54701 /* mazestack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1B33D482BDF1F8400A54701 /* mazestack.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +24,7 @@
 
 /* Begin PBXFileReference section */
 		C1B33D452BDF1F8400A54701 /* s24Homework2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = s24Homework2; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1B33D482BDF1F8400A54701 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		C1B33D482BDF1F8400A54701 /* mazestack.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mazestack.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +57,33 @@
 		C1B33D472BDF1F8400A54701 /* s24Homework2 */ = {
 			isa = PBXGroup;
 			children = (
-				C1B33D482BDF1F8400A54701 /* main.cpp */,
+				C1B33D4F2BE0687200A54701 /* Problem 1 */,
+				C1B33D502BE0689500A54701 /* Problem 3 */,
+				C1B33D512BE068A100A54701 /* Problem 5 */,
 			);
 			path = s24Homework2;
+			sourceTree = "<group>";
+		};
+		C1B33D4F2BE0687200A54701 /* Problem 1 */ = {
+			isa = PBXGroup;
+			children = (
+				C1B33D482BDF1F8400A54701 /* mazestack.cpp */,
+			);
+			path = "Problem 1";
+			sourceTree = "<group>";
+		};
+		C1B33D502BE0689500A54701 /* Problem 3 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Problem 3";
+			sourceTree = "<group>";
+		};
+		C1B33D512BE068A100A54701 /* Problem 5 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Problem 5";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,7 +143,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1B33D492BDF1F8400A54701 /* main.cpp in Sources */,
+				C1B33D492BDF1F8400A54701 /* mazestack.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
