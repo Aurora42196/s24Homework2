@@ -14,7 +14,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec);
          // through the maze; return false otherwise
 
 ///////////////////////////////////////////////////////////////////////////
-//  main function
+//  main function (COMMENT THE FUNCTION OUT BEFORE TURNING IT IN!!!!!!)
 ///////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -22,28 +22,28 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec);
 
 using namespace std;
 
-int main()
-{
-    char maze[10][10] = {
-        // 0   1   2   3   4   5   6   7   8   9
-        { 'X','X','X','X','X','X','X','X','X','X' }, // 0
-        { 'X','.','.','.','X','.','.','X','.','X' }, // 1
-        { 'X','.','X','X','X','.','.','.','.','X' }, // 2
-        { 'X','.','X','.','X','X','X','X','.','X' }, // 3
-        { 'X','X','X','.','.','.','.','.','.','X' }, // 4
-        { 'X','.','.','.','X','.','X','X','.','X' }, // 5
-        { 'X','.','X','.','X','.','.','X','.','X' }, // 6
-        { 'X','.','X','X','X','X','.','X','.','X' }, // 7
-        { 'X','.','.','X','.','.','.','X','.','X' }, // 8
-        { 'X','X','X','X','X','X','X','X','X','X' }  // 9
-    };
-    
-    if (pathExists(maze, 4,3, 1,8))
-        cout << "Solvable!" << endl;
-    else
-        cout << "Out of luck!" << endl;
-    
-}
+//int main()
+//{
+//    char maze[10][10] = {
+//        // 0   1   2   3   4   5   6   7   8   9
+//        { 'X','X','X','X','X','X','X','X','X','X' }, // 0
+//        { 'X','.','.','.','X','.','.','X','.','X' }, // 1
+//        { 'X','.','X','X','X','.','.','.','.','X' }, // 2
+//        { 'X','.','X','.','X','X','X','X','.','X' }, // 3
+//        { 'X','X','X','.','.','.','.','.','.','X' }, // 4
+//        { 'X','.','.','.','X','.','X','X','.','X' }, // 5
+//        { 'X','.','X','.','X','.','.','X','.','X' }, // 6
+//        { 'X','.','X','X','X','X','.','X','.','X' }, // 7
+//        { 'X','.','.','X','.','.','.','X','.','X' }, // 8
+//        { 'X','X','X','X','X','X','X','X','X','X' }  // 9
+//    };
+//    
+//    if (pathExists(maze, 4,3, 1,8))
+//        cout << "Solvable!" << endl;
+//    else
+//        cout << "Out of luck!" << endl;
+//    
+//}
 
 ///////////////////////////////////////////////////////////////////////////
 //  Class implementations
@@ -73,7 +73,7 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec)
     while(!coordStack.empty())
     {
         Coord curr = coordStack.top();
-        cerr << "Coordinate popped off the stack: [" << curr.r() << "][" << curr.c() << "]" << endl;
+//        cerr << "Coordinate popped off the stack: [" << curr.r() << "][" << curr.c() << "]" << endl;
         coordStack.pop();
         
         if (curr.r() == er && curr.c() == ec) // if the current coordinate is equal to the ending coordinate
