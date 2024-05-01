@@ -70,9 +70,20 @@ int evaluate(string infix, string& postfix, bool& result)
         newInfix += infix.at(i);
     }
     
+    // Special case: newInfix only has one character in it
     if(newInfix.size() == 1)
     {
-        if (newInfix != "T" && newInfix != "F")
+        if (newInfix == "T")
+        {
+            result = true;
+            return 0;
+        }
+        else if(newInfix == "F")
+        {
+            result = false;
+            return 0;
+        }
+        else
             return 1;
     }
     
