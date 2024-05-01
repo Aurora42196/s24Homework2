@@ -17,7 +17,6 @@ bool pathExists(char maze[][10], int sr, int sc, int er, int ec);
          // Return true if there is a path from (sr,sc) to (er,ec)
          // through the maze; return false otherwise
 
-
 ///////////////////////////////////////////////////////////////////////////
 //  Class implementations
 ///////////////////////////////////////////////////////////////////////////
