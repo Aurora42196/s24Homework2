@@ -70,6 +70,12 @@ int evaluate(string infix, string& postfix, bool& result)
         newInfix += infix.at(i);
     }
     
+    if(newInfix.size() == 1)
+    {
+        if (newInfix != "T" && newInfix != "F")
+            return 1;
+    }
+    
     for(int k = 0; k != newInfix.size(); k++)
     {
         char ch = newInfix.at(k);
@@ -115,6 +121,9 @@ int evaluate(string infix, string& postfix, bool& result)
         opStack.pop();
     }
     
+    // By this point, postfix should be a syntactically valid postfix string,
+    // meaning newInfix should be syntactically valid before this function is ever called
+    // if newInfix is not valid, then result should remain unchanged
     result = postfixEval(postfix);
     
     cerr << "Made it to end of evaluate function somehow" << endl;
