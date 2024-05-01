@@ -94,7 +94,7 @@ int evaluate(string infix, string& postfix, bool& result)
             break;
             
         default: // Infix expression cannot start with anything other than above cases
-            cerr << "infix expression cannot begin with " << infix.at(0);
+            cerr << "infix expression cannot begin with " << infix.at(0) << endl;
             return 1;
             break;
     }
@@ -107,7 +107,7 @@ int evaluate(string infix, string& postfix, bool& result)
             break;
             
         default: // Infix expression cannot start with anything other than above cases
-            cerr << "infix expression cannot end with " << infix.at(infix.size()-1);
+            cerr << "infix expression cannot end with " << infix.at(infix.size()-1) << endl;
             return 1;
             break;
     }
@@ -121,15 +121,25 @@ int evaluate(string infix, string& postfix, bool& result)
         {
             case 'T':
             case 'F':
+                if (!validInfix(prev, infix.at(k)))
+                    return 1;
                 prev = ch;
+                
                 postfix += ch;
                 break;
             case '(':
+            case '!':
+                if (!validInfix(prev, infix.at(k)))
+                    return 1;
                 prev = ch;
+                
                 opStack.push(ch);
                 break;
             case ')':
+                if (!validInfix(prev, infix.at(k)))
+                    return 1;
                 prev = ch;
+                
                 while(opStack.top() != '(')
                 {
                     if (opStack.empty())
@@ -139,9 +149,10 @@ int evaluate(string infix, string& postfix, bool& result)
                 }
                 opStack.pop();
                 break;
-            case '!':
             case '&':
             case '|':
+                if (!validInfix(prev, infix.at(k)))
+                    return 1;
                 prev = ch;
                 // checkPrecedence(ch,opStack.top()) validates if the precedence of ch <= precedence of stack top
                 while (!opStack.empty() && opStack.top() != '(' && checkPrecedence(ch,opStack.top()) == true)
@@ -171,7 +182,7 @@ int evaluate(string infix, string& postfix, bool& result)
     // if newInfix is not valid, then result should remain unchanged
     result = postfixEval(postfix);
     
-    cerr << "Made it to end of evaluate function somehow" << endl;
+//    cerr << "Made it to end of evaluate function somehow" << endl;
     return 0;
 }
 
@@ -213,25 +224,126 @@ bool checkPrecedence(const char& ch, const char& top)
 
 bool validInfix(const char& prev, const char& curr)
 {
-    
-//    
-//    switch (prev)
-//    {
-//        case constant:
-//            <#statements#>
-//            break;
-//            
-//        default:
-//            break;
-//    }
-    return false;
+    switch (prev) 
+    {
+        case 'T':
+        case 'F':
+            switch (curr) 
+            {
+                case '&':
+                case '|':
+                case '(':
+                case ')':
+                    return true;
+                    
+                default:
+                    cerr << "invalid char after T or F" << endl;
+                    return false;
+            }
+            
+        case '&':
+        case '|':
+        case '!':
+        case '(':
+            switch (curr)
+            {
+                case 'T':
+                case 'F':
+                case '!':
+                case '(':
+                    return true;
+                    
+                default:
+                    cerr << "invalid char after " << prev << endl;
+                    return false;
+            }
+            
+        case ')':
+            switch (curr)
+            {
+                case '&':
+                case ')':
+                    return true;
+                    
+                default:
+                    cerr << "invalid char after )" << endl;
+                    return false;
+            }
+        case '\0': // this means that curr is the first valid char in the expression
+            return true;
+            
+        default:
+            cerr << "invalid char passed in for prev" << endl;
+            return false;
+    }
 }
 
 
 bool postfixEval(string& pf)
 {
+    stack<char> pfStack;
+    for(int i = 0; i < pf.size(); i++)
+    {
+        char ch = pf.at(i);
+        switch (ch) 
+        {
+            case 'T':
+            case 'F':
+                pfStack.push(ch);
+                break;
+                
+            case '!': 
+            {
+                char operand = pfStack.top();
+                pfStack.pop();
+                if (operand == 'T')
+                    pfStack.push('F');
+                if (operand == 'F')
+                    pfStack.push('T');
+                break;
+            }
+            case '&': // ch is a binary operator
+            case '|':
+            {
+                char operand2 = pfStack.top();
+                pfStack.pop();
+                char operand1 = pfStack.top();
+                pfStack.pop();
+                
+                if (ch == '&')
+                {
+                    if (operand1 == operand2)
+                        pfStack.push(operand1);
+                    else if(operand1 == 'F')
+                        pfStack.push(operand1);
+                    else
+                        pfStack.push(operand2);
+                }
+                
+                if(ch == '|')
+                {
+                    if (operand1 == operand2)
+                        pfStack.push(operand1);
+                    else if(operand1 == 'T')
+                        pfStack.push(operand1);
+                    else
+                        pfStack.push(operand2);
+                }
+                
+                break;
+            }
+                
+            default:
+                cerr << "invalid char passed into pf" << endl;
+                exit(1);
+                
+        }
+    }
     
-    return false;
+    if (pfStack.top() == 'T')
+        return true;
+    else
+        return false;
 }
 
 
