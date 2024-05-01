@@ -24,12 +24,13 @@ int evaluate(string infix, string& postfix, bool& result);
 //   that case, postfix may or may not be changed, but result must
 //   be unchanged.
 
-bool checkPrecedence(const int& ch, const char& top);
+bool checkPrecedence(const char& ch, const char& top);
 // returns true only if the precedence of ch <= precedence of stack top
 // and returns false otherwise (i.e. precedence of ch was greater than top, invalid ch was passed in)
 
-bool postfixEval(string& pf, bool& result);
+bool postfixEval(string& pf);
 // helper function to evaluate the postfix function
+
 
 ///////////////////////////////////////////////////////////////////////////
 //  Function implementations
@@ -42,17 +43,37 @@ bool postfixEval(string& pf, bool& result);
 ///  3. | => inclusive or                       left to right
 ///  4. operands => T, F                     left to right
 ///
+/// Here are some examples of valid expressions:
+/// T                          evaluates to true
+/// (F)                        evaluates to false
+/// T&(F)                      evaluates to false
+/// T & !F                     evaluates to true
+/// !(F|T)                     evaluates to false
+/// !F|T                       evaluates to true
+/// T|F&F                      evaluates to true
+/// T&!(F|T&T|F)|!!!(F&T&F)    evaluates to true
+///
 int evaluate(string infix, string& postfix, bool& result)
 {
     if (infix.empty()) // check if the string passed in is empty
         return 1;
     
+    postfix = "";
     stack<char> opStack; //Initialize the operator stack to empty
     
-    for(int k = 0; k != infix.size(); k++)
+    // alter infix to remove spaces
+    string newInfix = "";
+    for (int i = 0; i < infix.size(); i++)
     {
-        char ch = infix.at(k);
-        switch (ch) 
+        if (infix.at(i) == ' ')
+            continue;
+        newInfix += infix.at(i);
+    }
+    
+    for(int k = 0; k != newInfix.size(); k++)
+    {
+        char ch = newInfix.at(k);
+        switch (ch)
         {
             case 'T':
             case 'F':
@@ -83,9 +104,6 @@ int evaluate(string infix, string& postfix, bool& result)
                 opStack.push(ch);
                 break;
                 
-            case ' ':
-                continue; // ignore blank space in the infix string
-                
             default: ///syntactically invalid infix string (any char passed in that is not one of the cases above)
                 return 1;
                 break;
@@ -96,41 +114,51 @@ int evaluate(string infix, string& postfix, bool& result)
         postfix += opStack.top();
         opStack.pop();
     }
+    
+    result = postfixEval(postfix);
+    
+    cerr << "Made it to end of evaluate function somehow" << endl;
     return 0;
 }
 
-bool checkPrecedence(const int& ch, const char& top)
+bool checkPrecedence(const char& ch, const char& top)
 {
-    if(ch != '!' && ch != '&' && ch != '|' && ch != 'T' && ch != 'F')
-        return false;
-    
-    if(ch == top)
-        return true;
-    
-    switch (ch)
+    switch (ch) // Used to check if precedence of ch <= the precedence of stack.top()
     {
         case '!':
-            if(top >= 33) // ASCII value of !
+            if(top == '!')
                 return true;
+            else 
+                return false;
             break;
+            
         case '&':
-            if(top >= 38) // ASCII value of &
+            if(top == '!' || top == '&')
                 return true;
             else
                 return false;
+            
         case '|':
-            if (top == 'T' || top == 'F') // operands are the only lower precedence to |
+            if (top == '!' || top == '&' || top == '|')
+                return true;
+            else
                 return false;
+            
         case 'T':
         case 'F':
-            if(top == ch)
+            if(top == '!' || top == '&' || top == '|' || top == 'T' || top == 'F')
                 return true;
             else
                 return false;
-        default: // value for char is not any of the values above
-            cerr << "checkPrecedence switch default called!" << endl; // this will never be called and if it does, something went terribly wrong!
+        default: // value for ch is not any of the values above
+            cerr << "invalid char: cannot check precedence" << endl;
+            return false;
             break;
     }
+}
+
+bool postfixEval(string& pf)
+{
     
     return false;
 }
