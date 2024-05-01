@@ -28,6 +28,10 @@ bool checkPrecedence(const char& ch, const char& top);
 // returns true only if the precedence of ch <= precedence of stack top
 // and returns false otherwise (i.e. precedence of ch was greater than top, invalid ch was passed in)
 
+bool validInfix(const char& prev, const char& curr);
+// helper function to check if the infix expression is syntactically valid by checking
+// whether the current char is a valid char to succeed the previous char
+
 bool postfixEval(string& pf);
 // helper function to evaluate the postfix function
 
@@ -61,45 +65,71 @@ int evaluate(string infix, string& postfix, bool& result)
     postfix = "";
     stack<char> opStack; //Initialize the operator stack to empty
     
-    // alter infix to remove spaces
-    string newInfix = "";
-    for (int i = 0; i < infix.size(); i++)
+    // assign the first and last valid characters of the infix expression in the case that there's space at the beginning or the end of the string
+    char start = '\0';
+    char end = '\0';
+    for (unsigned long i = 0; i < infix.size(); i++)
     {
         if (infix.at(i) == ' ')
             continue;
-        newInfix += infix.at(i);
-    }
-    
-    // Special case: newInfix only has one character in it
-    if(newInfix.size() == 1)
-    {
-        if (newInfix == "T")
-        {
-            result = true;
-            return 0;
-        }
-        else if(newInfix == "F")
-        {
-            result = false;
-            return 0;
-        }
         else
-            return 1;
+            start = infix.at(i);
+            break;
+    }
+    for (unsigned long i = infix.size()-1; i > 0; i--)
+    {
+        if (infix.at(i) == ' ')
+            continue;
+        else
+            end = infix.at(i);
+            break;
     }
     
-    for(int k = 0; k != newInfix.size(); k++)
+    switch (start) // Check the beginning of the string for valid starting character
     {
-        char ch = newInfix.at(k);
+        case 'T':
+        case 'F':
+        case '!':
+        case '(':
+            break;
+            
+        default: // Infix expression cannot start with anything other than above cases
+            cerr << "infix expression cannot begin with " << infix.at(0);
+            return 1;
+            break;
+    }
+    
+    switch (end) // Check the end of the string for valid starting character
+    {
+        case 'T':
+        case 'F':
+        case ')':
+            break;
+            
+        default: // Infix expression cannot start with anything other than above cases
+            cerr << "infix expression cannot end with " << infix.at(infix.size()-1);
+            return 1;
+            break;
+    }
+
+    
+    char prev; // keeps track of the last significant char before iterating through the next char in the string
+    for(int k = 0; k != infix.size(); k++)
+    {
+        char ch = infix.at(k);
         switch (ch)
         {
             case 'T':
             case 'F':
+                prev = ch;
                 postfix += ch;
                 break;
             case '(':
+                prev = ch;
                 opStack.push(ch);
                 break;
             case ')':
+                prev = ch;
                 while(opStack.top() != '(')
                 {
                     if (opStack.empty())
@@ -112,6 +142,7 @@ int evaluate(string infix, string& postfix, bool& result)
             case '!':
             case '&':
             case '|':
+                prev = ch;
                 // checkPrecedence(ch,opStack.top()) validates if the precedence of ch <= precedence of stack top
                 while (!opStack.empty() && opStack.top() != '(' && checkPrecedence(ch,opStack.top()) == true)
                 {
@@ -120,6 +151,9 @@ int evaluate(string infix, string& postfix, bool& result)
                 }
                 opStack.push(ch);
                 break;
+                
+            case ' ':
+                continue; // we ignore any blank space in the expression
                 
             default: ///syntactically invalid infix string (any char passed in that is not one of the cases above)
                 return 1;
@@ -177,6 +211,23 @@ bool checkPrecedence(const char& ch, const char& top)
     }
 }
 
+bool validInfix(const char& prev, const char& curr)
+{
+    
+//    
+//    switch (prev)
+//    {
+//        case constant:
+//            <#statements#>
+//            break;
+//            
+//        default:
+//            break;
+//    }
+    return false;
+}
+
+
 bool postfixEval(string& pf)
 {
     
@@ -192,6 +243,8 @@ int main()
 {
     string pf;
     bool answer;
+    assert(evaluate(" F  ", pf, answer) == 0 &&  pf == "F"  &&  !answer);
+    assert(evaluate("   T| F   ", pf, answer) == 0  &&  pf == "TF|"  &&  answer);
     assert(evaluate("T| F", pf, answer) == 0  &&  pf == "TF|"  &&  answer);
     assert(evaluate("", pf, answer) == 1);
     assert(evaluate("T|", pf, answer) == 1);
