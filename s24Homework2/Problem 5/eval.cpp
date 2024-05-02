@@ -74,7 +74,7 @@ int evaluate(string infix, string& postfix, bool& result)
             continue;
         else
             start = infix.at(i);
-            break;
+        break;
     }
     if(infix.size() == 1)
         end = infix.at(0);
@@ -99,7 +99,7 @@ int evaluate(string infix, string& postfix, bool& result)
             break;
             
         default: // Infix expression cannot start with anything other than above cases
-            cerr << "infix expression cannot begin with " << infix.at(0) << endl;
+//            cerr << "infix expression cannot begin with " << infix.at(0) << endl;
             return 1;
             break;
     }
@@ -113,7 +113,7 @@ int evaluate(string infix, string& postfix, bool& result)
             break;
             
         default: // Infix expression cannot start with anything other than above cases
-            cerr << "infix expression cannot end with " << infix.at(infix.size()-1) << endl;
+//            cerr << "infix expression cannot end with " << infix.at(infix.size()-1) << endl;
             return 1;
             break;
     }
@@ -138,7 +138,7 @@ int evaluate(string infix, string& postfix, bool& result)
     }
 
     
-    char prev; // keeps track of the last significant char before iterating through the next char in the string
+    char prev = '\0'; // keeps track of the last significant char before iterating through the next char in the string
     for(int k = 0; k != infix.size(); k++)
     {
         char ch = infix.at(k);
@@ -252,7 +252,7 @@ bool checkPrecedence(const char& ch, const char& top)
             else
                 return false;
         default: // value for ch is not any of the values above
-            cerr << "invalid char: cannot check precedence" << endl;
+//            cerr << "invalid char: cannot check precedence" << endl;
             return false;
             break;
     }
@@ -273,7 +273,7 @@ bool validInfix(const char& prev, const char& curr)
                     return true;
                     
                 default:
-                    cerr << "invalid char after T or F" << endl;
+//                    cerr << "invalid char after T or F" << endl;
                     return false;
             }
             
@@ -290,7 +290,7 @@ bool validInfix(const char& prev, const char& curr)
                     return true;
                     
                 default:
-                    cerr << "invalid char after " << prev << endl;
+//                    cerr << "invalid char after " << prev << endl;
                     return false;
             }
             
@@ -298,7 +298,7 @@ bool validInfix(const char& prev, const char& curr)
             return true;
             
         default:
-            cerr << "invalid char passed in for prev" << endl;
+//            cerr << "invalid char passed in for prev" << endl;
             return false;
     }
 }
@@ -358,7 +358,7 @@ bool postfixEval(string& pf)
                 break;
             }
             default:
-                cerr << "invalid char passed into pf" << endl;
+//                cerr << "invalid char passed into pf" << endl;
                 exit(1);
         }
     }
@@ -414,7 +414,7 @@ int main()
     assert(evaluate(" T ( F & F )", pf, answer) == 1);
     assert(evaluate("T | (F&F|)", pf, answer) == 1);
     assert(evaluate(" T ( & F ) ", pf, answer) == 1);
-    cout << "checkpoint" << endl;
+//    cout << "checkpoint" << endl;
     assert(evaluate(" F | (T) ) ", pf, answer) == 1);
     assert(evaluate("(((((F)))))", pf, answer) == 0 && pf == "F" && !answer);
     assert(evaluate("T| F", pf, answer) == 0 && pf == "TF|" && answer);
@@ -432,7 +432,7 @@ int main()
            && pf == "FF!TF&&|" && !answer);
     assert(evaluate(" F  ", pf, answer) == 0 && pf == "F" && !answer);
     assert(evaluate("((T))", pf, answer) == 0 && pf == "T" && answer);
-    cout << "Passed all tests" << endl;
+//    cout << "Passed all tests" << endl;
     
     assert(evaluate("!(T&F|T)", pf, answer) == 0 && pf == "TF&T|!" && !answer);
     assert(evaluate("(T|F)&(F|F)&(!F|F&T)&T", pf, answer) == 0 && pf == "TF|FF|&F!FT&|&T&" && !answer);
