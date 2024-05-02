@@ -76,13 +76,18 @@ int evaluate(string infix, string& postfix, bool& result)
             start = infix.at(i);
             break;
     }
-    for (unsigned long i = infix.size()-1; i > 0; i--)
+    if(infix.size() == 1)
+        end = infix.at(0);
+    else
     {
-        if (infix.at(i) == ' ')
-            continue;
-        else
-            end = infix.at(i);
+        for (unsigned long i = infix.size()-1; i > 0; i--)
+        {
+            if (infix.at(i) == ' ')
+                continue;
+            else
+                end = infix.at(i);
             break;
+        }
     }
     
     switch (start) // Check the beginning of the string for valid starting character
@@ -104,12 +109,32 @@ int evaluate(string infix, string& postfix, bool& result)
         case 'T':
         case 'F':
         case ')':
+//        case '\0': // in this case, infix is only one char long
             break;
             
         default: // Infix expression cannot start with anything other than above cases
             cerr << "infix expression cannot end with " << infix.at(infix.size()-1) << endl;
             return 1;
             break;
+    }
+    
+    // special case that infix is a single character long
+    if(infix.size() == 1)
+    {
+        if (infix.at(0) == 'T')
+        {
+            postfix += 'T';
+            result = true;
+            return 0;
+        }
+        else if (infix.at(0) == 'F')
+        {
+            postfix += 'F';
+            result = false;
+            return 0;
+        }
+        else // invalid char inside infix expression
+            return 1;
     }
 
     
@@ -140,13 +165,14 @@ int evaluate(string infix, string& postfix, bool& result)
                     return 1;
                 prev = ch;
                 
-                while(opStack.top() != '(')
+                
+                while(!opStack.empty() && opStack.top() != '(')
                 {
-                    if (opStack.empty())
-                        return 1;
                     postfix += opStack.top();
                     opStack.pop();
                 }
+                if (opStack.empty()) // this means there are more ) than ( in the expression, which is an unbalanced number of parentheses
+                    return 1;
                 opStack.pop();
                 break;
             case '&':
@@ -173,6 +199,8 @@ int evaluate(string infix, string& postfix, bool& result)
     }
     while(!opStack.empty())
     {
+        if(opStack.top() == '(' || opStack.top() == ')') // unbalanced number of parentheses
+            return 1;
         postfix += opStack.top();
         opStack.pop();
     }
@@ -187,7 +215,15 @@ int evaluate(string infix, string& postfix, bool& result)
 }
 
 bool checkPrecedence(const char& ch, const char& top)
-{
+{   /// This function compares the precedence of ch and top
+    /// ch <= top
+    /// ===============
+    /// ch              top
+    /// !                  !
+    /// &                 !, &
+    /// |                   !, &, |
+    /// T,F               !, &, |, T, F
+    ///
     switch (ch) // Used to check if precedence of ch <= the precedence of stack.top()
     {
         case '!':
@@ -228,11 +264,11 @@ bool validInfix(const char& prev, const char& curr)
     {
         case 'T':
         case 'F':
-            switch (curr) 
+        case ')':
+            switch (curr)
             {
                 case '&':
                 case '|':
-                case '(':
                 case ')':
                     return true;
                     
@@ -258,18 +294,7 @@ bool validInfix(const char& prev, const char& curr)
                     return false;
             }
             
-        case ')':
-            switch (curr)
-            {
-                case '&':
-                case ')':
-                    return true;
-                    
-                default:
-                    cerr << "invalid char after )" << endl;
-                    return false;
-            }
-        case '\0': // this means that curr is the first valid char in the expression
+        case '\0': // special case where curr is the first valid char in the expression, meaning prev will remain uninitialized
             return true;
             
         default:
@@ -332,11 +357,9 @@ bool postfixEval(string& pf)
                 
                 break;
             }
-                
             default:
                 cerr << "invalid char passed into pf" << endl;
                 exit(1);
-                
         }
     }
     
@@ -355,9 +378,46 @@ int main()
 {
     string pf;
     bool answer;
-    assert(evaluate(" F  ", pf, answer) == 0 &&  pf == "F"  &&  !answer);
-    assert(evaluate("   T| F   ", pf, answer) == 0  &&  pf == "TF|"  &&  answer);
-    assert(evaluate("T| F", pf, answer) == 0  &&  pf == "TF|"  &&  answer);
+    assert(evaluate("!!(F|T)", pf, answer) == 0 && pf == "FT|!!" && answer);
+    assert(evaluate("T&!F", pf, answer) == 0 && answer);
+    assert(evaluate("T|F&F", pf, answer) == 0 && answer);
+    assert(evaluate("!F|T", pf, answer) == 0  && answer);
+    assert(evaluate("T", pf, answer) == 0 && pf == "T" && answer);
+    assert(evaluate("T & !(F | T & T | F) | !!!(F & T & F) ", pf, answer) == 0 && answer);
+    assert(evaluate("T", pf, answer) == 0 && pf == "T" && answer);
+    assert(evaluate("F", pf, answer) == 0 && pf == "F" && !answer);
+    assert(evaluate("!", pf, answer) == 1);
+    assert(evaluate("|", pf, answer) == 1);
+    assert(evaluate("&", pf, answer) == 1);
+    assert(evaluate("(", pf, answer) == 1);
+    assert(evaluate(")", pf, answer) == 1);
+    assert(evaluate("", pf, answer) == 1);
+    assert(evaluate("A", pf, answer) == 1);
+    assert(evaluate("TF", pf, answer) == 1);
+    assert(evaluate(" !    !!!!!! F  ", pf, answer) == 0);
+    assert(evaluate("T|F", pf, answer) == 0 && pf == "TF|" && answer);
+    assert(evaluate(" T | F ", pf, answer) == 0 && pf == "TF|" && answer);
+    assert(evaluate("T&F", pf, answer) == 0 && pf == "TF&" && !answer);
+    assert(evaluate(" T & F ", pf, answer) == 0 && pf == "TF&" && !answer);
+    assert(evaluate("!T", pf, answer) == 0 && pf == "T!" && !answer);
+    assert(evaluate(" ! T ", pf, answer) == 0 && pf == "T!" && !answer);
+    assert(evaluate("(T)", pf, answer) == 0 && pf == "T" && answer);
+    assert(evaluate(" ( T ) ", pf, answer) == 0 && pf == "T" && answer);
+    assert(evaluate(" ( T & ! ( F | T & T & ( ! F | F ) ) | F )", pf, answer) == 0 && pf == "TFTT&F!F|&|!&F|" && !answer);
+    assert(evaluate(" T ", pf, answer) == 0);
+    assert(evaluate(" T &   F    ", pf, answer) == 0 && pf == "TF&" && !answer);
+    assert(evaluate("(T&(T&(T&(T&(T&(T&(T&(T&(T)))))))))", pf, answer) == 0 && pf == "TTTTTTTTT&&&&&&&&");
+    assert(evaluate(" ", pf, answer) == 1);
+    assert(evaluate(" T !", pf, answer) == 1);
+    assert(evaluate(" T | &", pf, answer) == 1);
+    assert(evaluate(" ( ) ", pf, answer) == 1);
+    assert(evaluate(" T ( F & F )", pf, answer) == 1);
+    assert(evaluate("T | (F&F|)", pf, answer) == 1);
+    assert(evaluate(" T ( & F ) ", pf, answer) == 1);
+    cout << "checkpoint" << endl;
+    assert(evaluate(" F | (T) ) ", pf, answer) == 1);
+    assert(evaluate("(((((F)))))", pf, answer) == 0 && pf == "F" && !answer);
+    assert(evaluate("T| F", pf, answer) == 0 && pf == "TF|" && answer);
     assert(evaluate("", pf, answer) == 1);
     assert(evaluate("T|", pf, answer) == 1);
     assert(evaluate("F F", pf, answer) == 1);
@@ -369,8 +429,30 @@ int main()
     assert(evaluate("(T&(F|F)", pf, answer) == 1);
     assert(evaluate("T+F", pf, answer) == 1);
     assert(evaluate("F  |  !F & (T&F) ", pf, answer) == 0
-           &&  pf == "FF!TF&&|"  &&  !answer);
-    assert(evaluate(" F  ", pf, answer) == 0 &&  pf == "F"  &&  !answer);
-    assert(evaluate("((T))", pf, answer) == 0 &&  pf == "T"  &&  answer);
+           && pf == "FF!TF&&|" && !answer);
+    assert(evaluate(" F  ", pf, answer) == 0 && pf == "F" && !answer);
+    assert(evaluate("((T))", pf, answer) == 0 && pf == "T" && answer);
+    cout << "Passed all tests" << endl;
+    
+    assert(evaluate("!(T&F|T)", pf, answer) == 0 && pf == "TF&T|!" && !answer);
+    assert(evaluate("(T|F)&(F|F)&(!F|F&T)&T", pf, answer) == 0 && pf == "TF|FF|&F!FT&|&T&" && !answer);
+    assert(evaluate("!(T|F) | F | F | T&F | T & !F", pf, answer) == 0 && pf == "TF|!F|F|TF&|TF!&|" && answer);
+    assert(evaluate("T&T&T&T&T&T&T&T&T&T&F", pf, answer) == 0 && pf == "TT&T&T&T&T&T&T&T&T&F&" && !answer);
+    assert(evaluate("(T|F)&(F|T)&(T&T)&!(T&F)|F&F", pf, answer) == 0 && pf == "TF|FT|&TT&&TF&!&FF&|" && answer);
+    assert(evaluate("!!(T|F)&F|T&!T&!F|F|T", pf, answer) == 0 && pf == "TF|!!F&TT!&F!&|F|T|" && answer);
+    assert(evaluate("T", pf, answer) == 0 && pf == "T" && answer);
+    assert(evaluate("(F)", pf, answer) == 0 && pf == "F" && !answer);
+    assert(evaluate("T&(F) ", pf, answer) == 0 && pf == "TF&" && !answer);
+    assert(evaluate("T & !F", pf, answer) == 0 && pf == "TF!&" && answer);
+    assert(evaluate("  !(F|T)", pf, answer) == 0 && pf == "FT|!" && !answer);
+    assert(evaluate("!F | T", pf, answer) == 0 && pf == "F!T|" && answer);
+    assert(evaluate("T|F&F", pf, answer) == 0 && pf == "TFF&|" && answer);
+    assert(evaluate("T&!(F|T&T|F)|!!!(F&T&F)", pf, answer) == 0 && pf == "TFTT&|F|!&FT&F&!!!|" && answer);
+    assert(evaluate("!(!T&(!F|T)", pf, answer) == 1);
+    assert(evaluate("!(!F|T)&(!T|!F)|!!!F&!T&T&!(!F|T)", pf, answer) == 0 && pf == "F!T|!T!F!|&F!!!T!&T&F!T|!&|" && !answer);
+    assert(evaluate("!!(!F|T)&(!T|!F)|!!!F&T&T&!(!F|T)", pf, answer) == 0 && pf == "F!T|!!T!F!|&F!!!T&T&F!T|!&|" && answer);
+    assert(evaluate("!", pf, answer) == 1);
+    assert(evaluate("F|!F&(!F & !!!F & (!F & T) & (!!T))", pf, answer) == 0 && pf == "FF!F!F!!!&F!T&&T!!&&|" && answer);
+    
     cout << "Passed all tests" << endl;
 }
